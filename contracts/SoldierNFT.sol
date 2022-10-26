@@ -45,7 +45,7 @@ contract SoldierNFT is ERC721, Ownable{
         return _tokenURIs[tokenId];
     }
     
-    function wachinMint(string memory _tokenURI) public {
+    function mint(string memory _tokenURI) public {
         tokenCount += 1;
         _balances[msg.sender] += 1;  // balanceOf(msg.sender) += 1;
         _owners[tokenCount] = msg.sender;
