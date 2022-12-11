@@ -3,42 +3,50 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract SoldierNFT is ERC721, Ownable{
+contract SoldierNFT is Ownable, ERC721URIStorage{
     
-    uint256 price;
+    uint256 price = 0.0003 ether;
     uint256 public tokenCount; //funca tmbien como token id
-    mapping(uint256 => string) private _tokenURIs;   //tokenid => tokenuri
-    mapping(address => uint256) internal _balances; //uantos NFTS tiene
-    mapping(uint256 => address) internal _owners;   
-
-
+    
     constructor() ERC721("Soldier", "SLD"){
         price = 0.0001 ether;
     }
-    modifier cost (uint256 _price){
-        require(_price == price);
-        _;
-    }
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {    //  sobrescribe deafult ERC721 implementation ("")
-        require(ownerOf(tokenId) != address(0), "token doesnt exist");
-        return _tokenURIs[tokenId];
-    }
-    function amountOfTokensInAddress()public view returns(uint256){
-        return _balances[msg.sender];
-    }
-    function mint(string memory _tokenURI) public {
-        tokenCount += 1;
-        _balances[msg.sender] += 1;  // balanceOf(msg.sender) += 1;
-        _owners[tokenCount] = msg.sender;
-        _tokenURIs[tokenCount] = _tokenURI;
-        // _safeMint(msg.sender, tokenCount);
 
-        emit Transfer(address(0), msg.sender, tokenCount);
-        //event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);      
+    function mint(string memory _tokenURI) public payable returns(uint256) {
+        require(msg.value >= price, "No te alcanza papa, minimo es 0.0003");
+        tokenCount++;
+        _safeMint(msg.sender, tokenCount);
+        _setTokenURI(tokenCount, _tokenURI);
+        return tokenCount;
     }
+    function getPrice() public view returns(uint256){
+        return price;
+    }
+    function getMyNfts() public view returns (uint256[] memory _misTokens) {
+            _misTokens = new uint256[](balanceOf(msg.sender));
+            uint256 currentIndex;
+            for (uint256 i = 0; i < tokenCount ; i++){
+                if(ownerOf(i+1) == msg.sender) {
+                    _misTokens[currentIndex] = i + 1;
+                    currentIndex++;
+                }
+            }
 
-    // function newWoldierWeb3() external payable {
+        }
+    function withdraw() public {
+            address _owner = owner();
+            uint256 amount = address(this).balance;
+            (bool sent, ) =  _owner.call{value: amount}("");
+            require(sent, "Failed to send Ether");
+        }
+        receive() external payable {}   // Function to receive Ether. msg.data must be empty
+        fallback() external payable {}  // Fallback function is called when msg.data is not empty
+
+}
+
+// function newWoldierWeb3() external payable {
     //     address owner = owner();
 
     // }
@@ -51,22 +59,6 @@ contract SoldierNFT is ERC721, Ownable{
     //         // y AHI LA FUNCION "normal" de MINT
     //     //
     // }
-
-    
-    
-    
-
-    function withdraw() public {
-        address _owner = owner();
-        uint256 amount = address(this).balance;
-        (bool sent, ) =  _owner.call{value: amount}("");
-        require(sent, "Failed to send Ether");
-    }
-    receive() external payable {}   // Function to receive Ether. msg.data must be empty
-    fallback() external payable {}  // Fallback function is called when msg.data is not empty
-
-}
-
 
     // struct Soldier{
     //     uint256 uuid;

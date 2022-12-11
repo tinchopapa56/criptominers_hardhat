@@ -26,9 +26,11 @@ contract Eternal is ERC20, Ownable {
         uint256 freeAmount;
         require(!walletsClaimed1k[msg.sender], "already claimed your free 10k");
         if(msg.sender == _owner){
-            freeAmount = 10000 * 10**18;
+            // freeAmount = 10000 * 10**18;
+            freeAmount = 10000;
         } else {
-            freeAmount = 1000 * 10**18;
+            // freeAmount = 1000 * 10**18;
+            freeAmount = 1000;
         }
         
         walletsClaimed1k[msg.sender] = true;

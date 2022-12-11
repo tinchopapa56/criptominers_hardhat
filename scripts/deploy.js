@@ -6,7 +6,7 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const eternalContract= await ethers.getContractFactory("Eternal");
-  const deployedEternalContract = await eternalContract.deploy(100000);
+  const deployedEternalContract = await eternalContract.deploy(100);
   await deployedEternalContract.deployed();
   saveFrontendFiles(deployedEternalContract, "Eternal")
 
